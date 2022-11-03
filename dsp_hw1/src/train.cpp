@@ -27,18 +27,16 @@ void train(int iter, HMM *model, vector<vector<int>> &training_data) {
     const int n_seq = training_data.size(); // 10000 in train_seq_01~05.txt
 	const int n_obs = training_data[0].size(); // 50 in train_seq_01~05.txt
 	const int n_state = model->state_num; // 6
-    cout << "=== Training Process ===" << endl;
-	cout << "\n";
+    cout << "=== Training Process ===\n" << endl;
     for (int it = 0; it < iter; it++) {
-		cout << "\x1b[1A" << "\x1b[2K";
-        cout << "Iteration " << it+1 << " / " << iter << endl;
+		cout << "\x1b[1A" << "\x1b[2K" << "Iteration " << it+1 << " / " << iter << endl;
         double all_gamma[n_obs][n_state] = {};
         double observe_gamma[n_state][n_state] = {};
         double state_gamma[n_state] = {};
-        double all_epsilon[n_state][n_state] = {};  // [state] x [state]
+        double all_epsilon[n_state][n_state] = {};
 
         for (int seq = 0; seq < n_seq; seq++) {
-            double alpha[n_obs][n_state] = {};  // [time] x [state]
+            double alpha[n_obs][n_state] = {};
             double beta[n_obs][n_state] = {};
             double gamma[n_obs][n_state] = {};
             double epsilon[n_obs-1][n_state][n_state] = {};
@@ -46,7 +44,7 @@ void train(int iter, HMM *model, vector<vector<int>> &training_data) {
             // forward algorithm
             for (int i = 0; i < n_state; i++) {
 				// alpha_0(i) = pi_i * b_i(o_0)
-                int obs = training_data[seq][0];
+                int obs = training_data[seq][0]; // o_0
                 alpha[0][i] = model->initial[i] * model->observation[obs][i];
             }
             for (int t = 0; t < n_obs-1; t++) {
@@ -68,15 +66,15 @@ void train(int iter, HMM *model, vector<vector<int>> &training_data) {
                 int obs = training_data[seq][t + 1]; // o_t+1
                 for (int i = 0; i < n_state; i++) {
                     for (int j = 0; j < n_state; j++) {
-                        beta[t][i] += (model->transition[i][j] * model->observation[obs][j] * beta[t + 1][j]);
+                        beta[t][i] += model->transition[i][j] * model->observation[obs][j] * beta[t + 1][j];
                     }
                 }
             }
             // gamma_t(i)=alpha_t(i)*beta_t(i)/sum_j(alpha_t(j)*beta_t(j))=P(q_t=i|O,lambda)
             for (int t = 0; t < n_obs; t++) {
                 double total = 0.0;
-                for (int i = 0; i < n_state; i++) {
-                    total += (alpha[t][i] * beta[t][i]);
+                for (int j = 0; j < n_state; j++) {
+                    total += (alpha[t][j] * beta[t][j]);
                 }
                 int obs = training_data[seq][t]; // o_t
                 for (int i = 0; i < n_state; i++) {
@@ -104,16 +102,16 @@ void train(int iter, HMM *model, vector<vector<int>> &training_data) {
                 }
             }
             // epsilon(i, j) = sum_T epsilon (t, i, j)
-            for (int t = 0; t < n_obs-1; t++) {
-                for (int i = 0; i < n_state; i++) {
-                    for (int j = 0; j < n_state; j++) {
+            for (int i = 0; i < n_state; i++) {
+                for (int j = 0; j < n_state; j++) {
+                    for (int t = 0; t < n_obs-1; t++) {
                         all_epsilon[i][j] += epsilon[t][i][j];
                     }
                 }
             }
         }
         // update parameter
-        for (int t = 0; t < n_obs; t++) {
+        for (int t = 0; t < n_obs-1; t++) {
             for (int i = 0; i < n_state; i++) {
                 state_gamma[i] += all_gamma[t][i];
             }
@@ -135,20 +133,20 @@ void train(int iter, HMM *model, vector<vector<int>> &training_data) {
             }
         }
     }
-    cout << "Training done." << endl;
+    cout << "=== Training done. ===" << endl;
 }
 
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        fprintf(stderr, "Usage: ./train_hmm $iter [model_init_file] [training data] [saved model path]\n");
+        cerr << "Usage: " << argv[0] << " <training_data> <test_data> <n_state> <n_iter>" << endl;
         exit(1);
     }
     int n_iter = atoi(argv[1]);
     string init_file(argv[2]), data_file(argv[3]), output_file(argv[4]);
 
-    printf("init: %s\ntrain: %s\ndump: %s\niter: %d\n", init_file.c_str(), data_file.c_str(), output_file.c_str(), n_iter);
-
+    cout << "init_file: " << init_file << "\ndata_file: " << data_file << endl;
+    cout << "output_file: " << output_file << "\nn_iter: " << n_iter << endl;
     // load data and model
     HMM model;
     vector<vector<int>> training_data = load_data(data_file);
@@ -158,7 +156,7 @@ int main(int argc, char *argv[]) {
     // save model
     FILE *fp = fopen(output_file.c_str(), "w");
     if(!fp) {
-        fprintf(stderr, "Error: cannot open file %s\n", output_file.c_str());
+        cerr << "Error: cannot open file " << output_file << endl;
         exit(1);
     }
     dumpHMM(fp, &model);

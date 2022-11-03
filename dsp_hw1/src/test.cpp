@@ -6,6 +6,7 @@
 #include "hmm.h"
 
 using namespace std;
+const int n_model = 5;
 
 vector<vector<int>> load_data(string &test_file) {
     fstream f_test;
@@ -35,7 +36,7 @@ void test(HMM models[], vector<vector<int>> &testing_data){
 	for(int l = 0; l < n_seq; l++){
 		int ans = 0;
 		double max_p = 0.0;
-		for (int m = 0; m < 5; m++){	// model num
+		for (int m = 0; m < n_model; m++){ // model num
 			// viterbi algo.
 			double delta[n_obs][n_state] = {};
 			// init
@@ -80,9 +81,9 @@ int main(int argc, char *argv[]){
 	}
     string model_list_file(argv[1]), testing_file(argv[2]), result_file(argv[3]);
 
-	HMM hmms[5];
+	HMM hmms[n_model];
     vector<vector<int>> testing_data = load_data(testing_file);
-	load_models(model_list_file.c_str(), hmms, 5);
+	load_models(model_list_file.c_str(), hmms, n_model);
 
 	// predict process
 	const int n_seq = testing_data.size(); // 2500 in test_seq_01~05.txt
