@@ -1,5 +1,5 @@
 #!/bin/bash
-n_iter=100
+n_iter=$1
 for ((i=1; i<=5; i++))
 do
     echo "Running $i"
@@ -7,3 +7,6 @@ do
 done
 
 ./test modellist.txt data/test_seq.txt result.txt
+
+echo "======= Accuracy ======="
+./cal_acc result.txt data/test_lbl.txt

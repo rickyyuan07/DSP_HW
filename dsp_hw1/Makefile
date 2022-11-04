@@ -17,5 +17,5 @@ cal_acc: src/cal_acc.cpp
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) -Iinc
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) model_0[1-5].txt result.txt
 

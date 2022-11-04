@@ -133,7 +133,7 @@ void train(int iter, HMM *model, vector<vector<int>> &training_data) {
             }
         }
     }
-    cout << "=== Training done. ===" << endl;
+    cout << "==== Training done. ====" << endl;
 }
 
 

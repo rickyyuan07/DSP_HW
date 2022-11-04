@@ -76,7 +76,7 @@ void test(HMM models[], vector<vector<int>> &testing_data){
 
 int main(int argc, char *argv[]){
 	if (argc != 4){
-		fprintf(stderr, "Usage: ./test_hmm [model_list file] [testing_file] [result file]\n");
+		cerr << "Usage: " << argv[0] << " <model_list_file> <testing_data_file> <result_file>" << endl;
 		exit(1);
 	}
     string model_list_file(argv[1]), testing_file(argv[2]), result_file(argv[3]);
@@ -94,7 +94,8 @@ int main(int argc, char *argv[]){
 	fstream result_f;
 	result_f.open(result_file, ios::out);
 	if ((!result_f.is_open())){
-		fprintf(stderr, "Can not open file [%s] !\n", result_file);
+		cerr << "Error: cannot open file " << result_file << endl;
+		exit(1);
 	}
 	for (int i = 0; i < n_seq; i++){
 		result_f << "model_0" << ans_arr[i] << ".txt " << likelihood[i] << endl;
