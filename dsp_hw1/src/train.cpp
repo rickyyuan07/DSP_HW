@@ -150,8 +150,9 @@ int main(int argc, char *argv[]) {
     HMM model;
     vector<vector<int>> training_data = load_data(data_file);
     loadHMM(&model, init_file.c_str());
-    // training process
+    // train model
     train(n_iter, &model, training_data);
+
     // save model
     FILE *fp = fopen(output_file.c_str(), "w");
     if(!fp) {

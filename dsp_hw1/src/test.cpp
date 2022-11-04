@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include "hmm.h"
 
 using namespace std;
@@ -27,7 +28,6 @@ vector<vector<int>> load_data(string &test_file) {
 vector<int> ans_arr;
 vector<double> likelihood;
 
-
 void test(HMM models[], vector<vector<int>> &testing_data){
 	const int n_seq = testing_data.size(); // 2500 in test_seq_01~05.txt
 	const int n_obs = testing_data[0].size(); // 50 in test_seq_01~05.txt
@@ -36,32 +36,28 @@ void test(HMM models[], vector<vector<int>> &testing_data){
 		int ans = 0;
 		double max_p = 0.0;
 		for (int m = 0; m < n_model; m++){ // model num
-			// viterbi algo.
+			// viterbi algorithm
 			double delta[n_obs][n_state] = {};
-			// init
-			int obs = testing_data[l][0];
+			// delta_0(i) = pi_i * b_i(o_0)
+			int obs = testing_data[l][0]; // o_0
 			for (int i = 0; i < n_state; i++){
 				delta[0][i] = models[m].initial[i] * models[m].observation[obs][i];
 			}
-			// dynamic programming
+			// delta_t+1(j) = max_i(delta_t(i)*a_ij)*b_j(o_t+1)
 			for (int t = 1; t < n_obs; t++){
-				obs = testing_data[l][t];
+				obs = testing_data[l][t]; // o_t
 				for (int j = 0; j < n_state; j++){
 					double max_val = 0.0;
 					for (int i = 0; i < n_state; i++){
-						double val = delta[t-1][i] * models[m].transition[i][j];
-						if (val > max_val){
-							max_val = val;
-						}
+						max_val = max(max_val, delta[t-1][i] * models[m].transition[i][j]);
 					}
 					delta[t][j] = max_val * models[m].observation[obs][j];
 				}
 			}
+			// p = max_i(delta_T-1(i))
 			double p_star = 0.0;
 			for (int i = 0; i < n_state; i++){
-				if (delta[n_obs-1][i] > p_star){
-					p_star = delta[n_obs-1][i];
-				}
+				p_star = max(p_star, delta[n_obs-1][i]);
 			}
 			if (p_star > max_p){
 				max_p = p_star;
