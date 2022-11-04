@@ -7,8 +7,7 @@
 using namespace std;
 
 vector<vector<int>> load_data(string &train_file) {
-    fstream f_train;
-    f_train.open(train_file, ios::in);  // train_seq_01~05.txt
+    fstream f_train(train_file, ios::in);  // train_seq_01~05.txt
     string line;
     vector<vector<int>> training_data;
     while (f_train >> line && line != "") {

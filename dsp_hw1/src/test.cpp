@@ -9,8 +9,7 @@ using namespace std;
 const int n_model = 5;
 
 vector<vector<int>> load_data(string &test_file) {
-    fstream f_test;
-    f_test.open(test_file, ios::in);  // test_seq_01~05.txt
+    fstream f_test(test_file, ios::in);  // test_seq_01~05.txt
     string line;
 	vector<vector<int>> testing_data;
     while (f_test >> line && line != "") {
@@ -91,8 +90,7 @@ int main(int argc, char *argv[]){
 	test(hmms, testing_data);
 	
 	// dump to output file
-	fstream result_f;
-	result_f.open(result_file, ios::out);
+	fstream result_f(result_file, ios::out);
 	if ((!result_f.is_open())){
 		cerr << "Error: cannot open file " << result_file << endl;
 		exit(1);
