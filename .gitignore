@@ -1,1 +1,4 @@
 .vscode/
+dsp_hw3/result
+dsp_hw3/ans/
+dsp_hw3/test_data/*.seg
